@@ -17,7 +17,7 @@ TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 
-RETRY_TIME = 600
+RETRY_PERIOD = 600
 ENDPOINT = 'https://practicum.yandex.ru/api/user_api/homework_statuses/'
 HEADERS = {'Authorization': f'OAuth {PRACTICUM_TOKEN}'}
 
@@ -70,13 +70,7 @@ def get_api_answer(current_timestamp: int) -> dict:
 
 
 def check_response(response: dict) -> list:
-    """Проверяет ответ API на корректность.
-    В качестве параметра функция получает ответ API,
-    приведенный к типам данных Python.
-    Если ответ API соответствует ожиданиям,
-    то функция должна вернуть список домашних работ (он может быть и пустым),
-    доступный в ответе API по ключу 'homeworks'
-    """
+    """Проверяет ответ API на корректность."""
     logging.info('Проверка ответа API на корректность')
     if not isinstance(response, dict):
         raise TypeError('Ответ API не является dict')
@@ -84,15 +78,12 @@ def check_response(response: dict) -> list:
         raise EmptyResponseFromAPI('Нет ключа homeworks в ответе API')
     homeworks = response.get('homeworks')
     if not isinstance(homeworks, list):
-        raise KeyError('homeworks не является list')
+        raise TypeError('homeworks не является list')
     return homeworks
 
 
 def parse_status(homework: dict) -> str:
-    """Извлекает из информации о конкретной домашней работе статус этой работы.
-    В случае успеха, функция возвращает подготовленную для отправки
-    в Telegram строку.
-    """
+    """Извлекает из информации о конкретной домашней работе."""
     logging.info('Проводим проверки и извлекаем статус работы')
     if 'homework_name' not in homework:
         raise KeyError('Нет ключа homework_name в ответе API')
@@ -156,7 +147,7 @@ def main():
                 prev_msg = message
 
         finally:
-            time.sleep(RETRY_TIME)
+            time.sleep(RETRY_PERIOD)
 
 
 if __name__ == '__main__':
