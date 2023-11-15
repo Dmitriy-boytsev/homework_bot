@@ -36,7 +36,8 @@ def send_message(bot: telegram.bot.Bot, message: str) -> None:
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
         logging.debug('Сообщение успешно отправлено в telegram')
     except telegram.error.TelegramError as error:
-        raise TelegramError(f'Ошибка отправки статуса в telegram: {error}')
+        logging.error(f'Ошибка отправки статуса в telegram: {error}')
+        pass
     else:
         logging.info('Статус отправлен в telegram')
 
