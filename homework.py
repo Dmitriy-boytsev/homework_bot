@@ -147,7 +147,10 @@ def main():
                 send_message(bot, message)
                 prev_msg = message
             except TelegramError as telegram_error:
-                logging.error(f'Ошибка при отправке сообщения в Telegram: {telegram_error}')
+                logging.error(
+                    'Ошибка при отправке сообщения в Telegram: '
+                    f'{telegram_error}'
+                )
 
         finally:
             time.sleep(RETRY_PERIOD)
