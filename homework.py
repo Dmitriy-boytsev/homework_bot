@@ -34,6 +34,7 @@ def send_message(bot: telegram.bot.Bot, message: str) -> None:
     try:
         logging.info('Начало отправки статуса в telegram')
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
+        logging.debug('Сообщение успешно отправлено в telegram')
     except telegram.error.TelegramError as error:
         raise TelegramError(f'Ошибка отправки статуса в telegram: {error}')
     else:
@@ -142,9 +143,14 @@ def main():
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.error(message, exc_info=True)
-            if message != prev_msg:
+            try:
                 send_message(bot, message)
                 prev_msg = message
+            except TelegramError as telegram_error:
+                logging.error(
+                    'Ошибка при отправке сообщения в Telegram: '
+                    f'{telegram_error}'
+                )
 
         finally:
             time.sleep(RETRY_PERIOD)
