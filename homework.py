@@ -13,8 +13,8 @@ from exceptions import (EmptyResponseFromAPI, NotForSend, TelegramError,
 
 load_dotenv()
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN')
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
-TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+TELEGRAM_TOKEN = os.getenv('TOKEN')
+TELEGRAM_CHAT_ID = os.getenv('CHAT_ID')
 
 
 RETRY_PERIOD = 600
@@ -151,7 +151,6 @@ def main():
                     'Ошибка при отправке сообщения в Telegram: '
                     f'{telegram_error}'
                 )
-
         finally:
             time.sleep(RETRY_PERIOD)
 
