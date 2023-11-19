@@ -120,7 +120,7 @@ def main():
         if not check_tokens():
             raise ValueError('Отсутствует токен. Бот остановлен!')
         bot = telegram.Bot(token=TELEGRAM_TOKEN)
-        current_timestamp = 0  # Используем 0 в первый раз
+        current_timestamp = 0
         start_message = 'Бот начал работу'
         send_message(bot, start_message)
         logging.info(start_message)
