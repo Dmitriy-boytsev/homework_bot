@@ -132,30 +132,34 @@ def main():
                     'current_date', int(time.time())
                 )
                 homeworks = check_response(response)
-                if homeworks:
-                    message = parse_status(homeworks[0])
-                else:
+
+                if not homeworks:
                     message = 'Нет новых статусов'
+                else:
+                    message = parse_status(homeworks[0])
+
                 if message != prev_msg and message not in prev_msg:
                     send_message(bot, message)
                     prev_msg = message
                 else:
                     logging.info(message)
-            except NotForSend as error:
+
+            except (NotForSend, TelegramError) as error:
                 message = f'Сбой в работе программы: {error}'
                 logging.error(message, exc_info=True)
+
             except Exception as error:
                 message = f'Сбой в работе программы: {error}'
                 logging.error(message, exc_info=True)
-                try:
-                    if message not in prev_msg:
+                if message not in prev_msg:
+                    try:
                         send_message(bot, message)
-                    prev_msg = message
-                except TelegramError as telegram_error:
-                    logging.error(
-                        'Ошибка при отправке сообщения в Telegram: '
-                        f'{telegram_error}'
-                    )
+                    except TelegramError as telegram_error:
+                        logging.error(
+                            'Ошибка при отправке сообщения в Telegram: '
+                            f'{telegram_error}'
+                        )
+                prev_msg = message
             finally:
                 time.sleep(RETRY_PERIOD)
     except Exception as main_error:
