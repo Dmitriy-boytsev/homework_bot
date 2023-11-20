@@ -157,8 +157,8 @@ def process_message(message, prev_msg, bot):
 
 
 def process_error(error, prev_msg):
-    """Обрабатывает ошибку,
-    логирует и отправляет сообщение, если необходимо
+    """Обрабатывает ошибку.
+    Логирует и отправляет сообщение, если необходимо
     """
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     message = f'Сбой в работе программы: {error}'
