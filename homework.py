@@ -119,12 +119,15 @@ def main():
     try:
         if not check_tokens():
             raise ValueError('Отсутствует токен. Бот остановлен!')
+
         bot = telegram.Bot(token=TELEGRAM_TOKEN)
         current_timestamp = 0
         start_message = 'Бот начал работу'
         send_message(bot, start_message)
         logging.info(start_message)
+
         prev_msg = ''
+
         while True:
             try:
                 response = get_api_answer(current_timestamp)
@@ -132,22 +135,18 @@ def main():
                     'current_date', int(time.time())
                 )
                 homeworks = check_response(response)
-
-                if not homeworks:
-                    message = 'Нет новых статусов'
-                else:
-                    message = parse_status(homeworks[0])
-
+                message = (
+                    'Нет новых статусов'
+                    if not homeworks else parse_status(homeworks[0])
+                )
                 if message != prev_msg and message not in prev_msg:
                     send_message(bot, message)
                     prev_msg = message
                 else:
                     logging.info(message)
-
             except (NotForSend, TelegramError) as error:
                 message = f'Сбой в работе программы: {error}'
                 logging.error(message, exc_info=True)
-
             except Exception as error:
                 message = f'Сбой в работе программы: {error}'
                 logging.error(message, exc_info=True)
