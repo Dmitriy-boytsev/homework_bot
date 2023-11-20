@@ -119,15 +119,12 @@ def main():
     try:
         if not check_tokens():
             raise ValueError('Отсутствует токен. Бот остановлен!')
-
         bot = telegram.Bot(token=TELEGRAM_TOKEN)
         current_timestamp = 0
         start_message = 'Бот начал работу'
         send_message(bot, start_message)
         logging.info(start_message)
-
         prev_msg = ''
-
         while True:
             try:
                 response = get_api_answer(current_timestamp)
@@ -162,8 +159,8 @@ def process_message(message, prev_msg, bot):
 def process_error(error, prev_msg):
     """Обрабатывает ошибку,
     логирует и отправляет сообщение, если необходимо."""
-    message = f'Сбой в работе программы: {error}'
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
+    message = f'Сбой в работе программы: {error}'
     logging.error(message, exc_info=True)
     if message not in prev_msg:
         try:
