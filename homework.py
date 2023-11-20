@@ -141,10 +141,8 @@ def main():
                 process_error(error, prev_msg)
             except Exception as error:
                 process_error(error, prev_msg)
-
             finally:
                 time.sleep(RETRY_PERIOD)
-
     except Exception as main_error:
         logging.critical(f'Произошла критическая ошибка: {main_error}')
 
@@ -156,11 +154,10 @@ def process_message(message, prev_msg, bot):
     logging.info(message)
 
 
-def process_error(error, prev_msg):
+def process_error(error, prev_msg, bot):
     """Обрабатывает ошибку.
     Логирует и отправляет сообщение, если необходимо
     """
-    bot = telegram.Bot(token=TELEGRAM_TOKEN)
     message = f'Сбой в работе программы: {error}'
     logging.error(message, exc_info=True)
     if message not in prev_msg:
