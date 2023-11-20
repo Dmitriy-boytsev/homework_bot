@@ -118,7 +118,9 @@ def main():
     """Основная логика работы бота."""
     try:
         if not check_tokens():
-            raise ValueError('Отсутствует токен. Бот остановлен!')
+            message = 'Отсутствует токен. Бот остановлен!'
+            logging.critical(message)
+            raise SystemExit(message)
         bot = telegram.Bot(token=TELEGRAM_TOKEN)
         current_timestamp = 0
         start_message = 'Бот начал работу'
@@ -138,9 +140,9 @@ def main():
                 )
                 process_message(message, prev_msg, bot)
             except (NotForSend, TelegramError) as error:
-                process_error(error, prev_msg)
+                process_error(error, prev_msg, bot)
             except Exception as error:
-                process_error(error, prev_msg)
+                process_error(error, prev_msg, bot)
             finally:
                 time.sleep(RETRY_PERIOD)
     except Exception as main_error:
