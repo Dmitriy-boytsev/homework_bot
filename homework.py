@@ -114,6 +114,30 @@ def check_tokens() -> bool:
     return True
 
 
+def process_message(message, prev_msg, bot):
+    """Обрабатывает сообщение, отправляет, если необходимо, и логирует."""
+    if message != prev_msg and message not in prev_msg:
+        send_message(bot, message)
+    logging.info(message)
+
+
+def process_error(error, prev_msg, bot):
+    """Обрабатывает ошибку.
+    Логирует и отправляет сообщение, если необходимо
+    """
+    message = f'Сбой в работе программы: {error}'
+    logging.error(message, exc_info=True)
+    if message not in prev_msg:
+        try:
+            send_message(bot, message)
+        except TelegramError as telegram_error:
+            logging.error(
+                'Ошибка при отправке сообщения в Telegram: '
+                f'{telegram_error}'
+            )
+    prev_msg = message
+
+
 def main():
     """Основная логика работы бота."""
     try:
@@ -147,30 +171,6 @@ def main():
                 time.sleep(RETRY_PERIOD)
     except Exception as main_error:
         logging.critical(f'Произошла критическая ошибка: {main_error}')
-
-
-def process_message(message, prev_msg, bot):
-    """Обрабатывает сообщение, отправляет, если необходимо, и логирует."""
-    if message != prev_msg and message not in prev_msg:
-        send_message(bot, message)
-    logging.info(message)
-
-
-def process_error(error, prev_msg, bot):
-    """Обрабатывает ошибку.
-    Логирует и отправляет сообщение, если необходимо
-    """
-    message = f'Сбой в работе программы: {error}'
-    logging.error(message, exc_info=True)
-    if message not in prev_msg:
-        try:
-            send_message(bot, message)
-        except TelegramError as telegram_error:
-            logging.error(
-                'Ошибка при отправке сообщения в Telegram: '
-                f'{telegram_error}'
-            )
-    prev_msg = message
 
 
 if __name__ == '__main__':
