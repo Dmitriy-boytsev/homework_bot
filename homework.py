@@ -135,34 +135,45 @@ def main():
                     'current_date', int(time.time())
                 )
                 homeworks = check_response(response)
-
                 message = (
                     'Нет новых статусов' if not homeworks
                     else parse_status(homeworks[0])
                 )
-                if message != prev_msg and message not in prev_msg:
-                    send_message(bot, message)
-                prev_msg = message
-                logging.info(message)
+                process_message(message, prev_msg, bot)
             except (NotForSend, TelegramError) as error:
-                message = f'Сбой в работе программы: {error}'
-                logging.error(message, exc_info=True)
+                process_error(error, prev_msg)
             except Exception as error:
-                message = f'Сбой в работе программы: {error}'
-                logging.error(message, exc_info=True)
-                if message not in prev_msg:
-                    try:
-                        send_message(bot, message)
-                    except TelegramError as telegram_error:
-                        logging.error(
-                            'Ошибка при отправке сообщения в Telegram: '
-                            f'{telegram_error}'
-                        )
-                prev_msg = message
+                process_error(error, prev_msg)
+
             finally:
                 time.sleep(RETRY_PERIOD)
+
     except Exception as main_error:
         logging.critical(f'Произошла критическая ошибка: {main_error}')
+
+
+def process_message(message, prev_msg, bot):
+    """Обрабатывает сообщение, отправляет, если необходимо, и логирует."""
+    if message != prev_msg and message not in prev_msg:
+        send_message(bot, message)
+    logging.info(message)
+
+
+def process_error(error, prev_msg):
+    """Обрабатывает ошибку,
+    логирует и отправляет сообщение, если необходимо."""
+    message = f'Сбой в работе программы: {error}'
+    bot = telegram.Bot(token=TELEGRAM_TOKEN)
+    logging.error(message, exc_info=True)
+    if message not in prev_msg:
+        try:
+            send_message(bot, message)
+        except TelegramError as telegram_error:
+            logging.error(
+                'Ошибка при отправке сообщения в Telegram: '
+                f'{telegram_error}'
+            )
+    prev_msg = message
 
 
 if __name__ == '__main__':
