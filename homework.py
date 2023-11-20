@@ -110,7 +110,8 @@ def check_tokens() -> bool:
     """
     logging.info('Проверка наличия всех токенов')
     if not all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]):
-        raise ValueError('Отсутствует один из токенов')
+        logging.critical('Отсутствует один из обязательных токенов')
+        raise ValueError('Отсутствует один из обязательных токенов')
     return True
 
 
@@ -121,10 +122,11 @@ def process_message(message, prev_msg, bot):
     logging.info(message)
 
 
-def process_error(error, prev_msg, bot):
+def process_error(error, prev_msg):
     """Обрабатывает ошибку.
     Логирует и отправляет сообщение, если необходимо
     """
+    bot = telegram.Bot(token=TELEGRAM_TOKEN)
     message = f'Сбой в работе программы: {error}'
     logging.error(message, exc_info=True)
     if message not in prev_msg:
@@ -142,9 +144,7 @@ def main():
     """Основная логика работы бота."""
     try:
         if not check_tokens():
-            message = 'Отсутствует токен. Бот остановлен!'
-            logging.critical(message)
-            raise SystemExit(message)
+            raise ValueError('Отсутствует токен. Бот остановлен!')
         bot = telegram.Bot(token=TELEGRAM_TOKEN)
         current_timestamp = 0
         start_message = 'Бот начал работу'
@@ -164,12 +164,12 @@ def main():
                 )
                 process_message(message, prev_msg, bot)
             except (NotForSend, TelegramError) as error:
-                process_error(error, prev_msg, bot)
+                process_error(error, prev_msg)
             except Exception as error:
-                process_error(error, prev_msg, bot)
+                process_error(error, prev_msg)
             finally:
                 time.sleep(RETRY_PERIOD)
-    except Exception as main_error:
+    except SystemExit as main_error:
         logging.critical(f'Произошла критическая ошибка: {main_error}')
 
 
